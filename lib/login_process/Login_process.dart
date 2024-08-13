@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../rank/home_screen.dart';
 import 'Login.dart';
 import 'SignUp.dart';
 // import 'StudentVerification.dart';
 // import 'Nickname.dart';
-import 'package:zero_c/home/Home_screen.dart';
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -43,7 +44,7 @@ class _LoginSignupFlowState extends State<LoginSignupFlow> {
   void _onLoginSuccess(UserCredential userCredential) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
+      MaterialPageRoute(builder: (context) => HomeScreen()),
     );
   }
 
