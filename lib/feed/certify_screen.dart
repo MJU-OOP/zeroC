@@ -1,12 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:zero_c/controller/Cfeed.dart';
 import 'package:zero_c/data/Mfeed.dart';
 import 'feed_screen.dart';
+import 'dart:typed_data';
 
 class CertifyScreen extends StatefulWidget {
   @override
@@ -16,8 +16,7 @@ class CertifyScreen extends StatefulWidget {
 class _CertifyScreenState extends State<CertifyScreen> {
   final _textController = TextEditingController();
   final FeedController _feedController = FeedController();
-  Uint8List? _profileImage;
-  Uint8List? _feedImage;
+  Uint8List? _feedImage;  // 이미지 데이터를 Uint8List로 받음
   User? _currentUser;
   String? _username;
   String? _schoolId;
@@ -44,17 +43,13 @@ class _CertifyScreenState extends State<CertifyScreen> {
     }
   }
 
-  Future<void> _pickImage(bool isProfile) async {
+  Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final bytes = await pickedFile.readAsBytes();
       setState(() {
-        if (isProfile) {
-          _profileImage = bytes;
-        } else {
-          _feedImage = bytes;
-        }
+        _feedImage = bytes;
       });
     } else {
       Fluttertoast.showToast(
@@ -66,22 +61,19 @@ class _CertifyScreenState extends State<CertifyScreen> {
   }
 
   void _submitPost() async {
-    if (_textController.text.isNotEmpty &&
-        _feedImage != null &&
-        _username != null &&
-        _schoolId != null) {
+    if (_textController.text.isNotEmpty && _feedImage != null && _username != null && _schoolId != null) {
       final newPost = PostData(
         userId: _currentUser?.uid ?? "Unknown",
         challengeId: "4",
         username: _username!,
         content: _textController.text,
-        profileImage: _profileImage,
-        feedImage: _feedImage,
+        profileImage: null,  // 프로필 이미지를 업로드하는 부분은 생략됨
+        feedImage: null,  // 이미지 URL은 나중에 추가됨
         createAt: DateTime.now(),
         schoolId: _schoolId!,
       );
 
-      await _feedController.addPost(newPost);
+      await _feedController.addPost(newPost, _feedImage);
 
       Fluttertoast.showToast(
         msg: "게시글이 성공적으로 업로드되었습니다!",
@@ -116,7 +108,7 @@ class _CertifyScreenState extends State<CertifyScreen> {
         child: Column(
           children: [
             GestureDetector(
-              onTap: () => _pickImage(false),
+              onTap: _pickImage,
               child: Container(
                 color: Colors.grey[300],
                 height: 200,
@@ -134,7 +126,7 @@ class _CertifyScreenState extends State<CertifyScreen> {
                 decoration: InputDecoration(
                   hintText: '내용을 입력해주세요',
                 ),
-                maxLines: null, // 여러 줄 입력 가능
+                maxLines: null,
               ),
             ),
             ElevatedButton(

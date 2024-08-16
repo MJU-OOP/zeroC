@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostData {
@@ -9,9 +6,9 @@ class PostData {
   final String challengeId;
   final String username;
   final String content;
-  final Uint8List? profileImage;
-  final Uint8List? feedImage;
-  final DateTime createAt; // 변경: String에서 DateTime으로
+  final String? profileImage;
+  final String? feedImage; 
+  final DateTime createAt;
   final String schoolId;
 
   PostData({
@@ -32,10 +29,9 @@ class PostData {
       'challenge_id': challengeId,
       'username': username,
       'content': content,
-      'profile_image':
-          profileImage != null ? base64Encode(profileImage!) : null,
-      'feed_image': feedImage != null ? base64Encode(feedImage!) : null,
-      'create_at': createAt, // 타임스탬프로 저장
+      'profile_image': profileImage,
+      'feed_image': feedImage,
+      'create_at': createAt,
       'school_id': schoolId,
     };
   }
@@ -48,13 +44,24 @@ class PostData {
       challengeId: data['challenge_id'] ?? 'Unknown',
       username: data['username'] ?? 'Unknown',
       content: data['content'] ?? '',
-      profileImage: data['profile_image'] != null
-          ? base64Decode(data['profile_image'])
-          : null,
-      feedImage:
-          data['feed_image'] != null ? base64Decode(data['feed_image']) : null,
+      profileImage: data['profile_image'],
+      feedImage: data['feed_image'],
       createAt: (data['create_at'] as Timestamp).toDate(),
       schoolId: data['school_id'] ?? 'Unknown',
+    );
+  }
+
+  PostData copyWith({String? feedImage}) {
+    return PostData(
+      feedId: feedId,
+      userId: userId,
+      challengeId: challengeId,
+      username: username,
+      content: content,
+      profileImage: profileImage,
+      feedImage: feedImage ?? this.feedImage,
+      createAt: createAt,
+      schoolId: schoolId,
     );
   }
 }

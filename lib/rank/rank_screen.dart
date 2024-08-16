@@ -65,7 +65,7 @@ class _RankScreenState extends State<RankScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => FeedScreen(
-                                schoolId: 'hiu',
+                                schoolId: 'mju',
                               ),
                             ),
                           );

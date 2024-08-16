@@ -1,11 +1,40 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart';
 import 'package:zero_c/data/Mfeed.dart';
 
 class FeedController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  Future<void> addPost(PostData postData) async {
+  Future<String?> uploadImageToStorage(Uint8List image, String path) async {
     try {
+      // 경로 생성
+      Reference storageReference = _storage.ref().child(path);
+      UploadTask uploadTask = storageReference.putData(image);
+      await uploadTask.whenComplete(() => null);
+      String downloadURL = await storageReference.getDownloadURL();
+      return downloadURL;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
+  }
+
+  Future<void> addPost(PostData postData, Uint8List? feedImage) async {
+    try {
+      String? imageUrl;
+
+      if (feedImage != null) {
+        String imagePath =
+            'feed/${postData.userId}/${basename(DateTime.now().toString())}.jpg';
+        imageUrl = await uploadImageToStorage(feedImage, imagePath);
+      }
+
+      postData = postData.copyWith(feedImage: imageUrl);
+
       await _firestore.collection('Feed').add(postData.toFirestore());
     } catch (e) {
       print("Error adding post: $e");
@@ -40,10 +69,13 @@ class FeedController {
       return [];
     }
   }
-  
+
   Future<void> updatePost(String id, PostData postData) async {
     try {
-      await _firestore.collection('Feed').doc(id).update(postData.toFirestore());
+      await _firestore
+          .collection('Feed')
+          .doc(id)
+          .update(postData.toFirestore());
     } catch (e) {
       print("Error updating post: $e");
     }
