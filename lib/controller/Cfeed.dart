@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:zero_c/data/post_data.dart';
 
-class DatabaseHelper {
+class FeedController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> addPost(PostData postData) async {
@@ -16,7 +16,7 @@ class DatabaseHelper {
     try {
       QuerySnapshot snapshot = await _firestore
           .collection('Feed')
-          .orderBy('create_at', descending: true) // createAt 필드 기준으로 내림차순 정렬
+          .orderBy('create_at', descending: true)
           .get();
 
       return snapshot.docs.map((doc) => PostData.fromFirestore(doc)).toList();
@@ -26,6 +26,21 @@ class DatabaseHelper {
     }
   }
 
+  Future<List<PostData>> getPostsBySchool(String schoolId) async {
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('Feed')
+          .where('school_id', isEqualTo: schoolId)
+          .orderBy('create_at', descending: true)
+          .get();
+
+      return snapshot.docs.map((doc) => PostData.fromFirestore(doc)).toList();
+    } catch (e) {
+      print("Error getting posts by school: $e");
+      return [];
+    }
+  }
+  
   Future<void> updatePost(String id, PostData postData) async {
     try {
       await _firestore.collection('Feed').doc(id).update(postData.toFirestore());

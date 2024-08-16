@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:zero_c/home_screen.dart';
+import '../rank/home_screen.dart';
 import 'Login.dart';
 import 'SignUp.dart';
 // import 'StudentVerification.dart';
 // import 'Nickname.dart';
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
