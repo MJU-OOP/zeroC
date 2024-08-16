@@ -1,11 +1,9 @@
-import 'dart:convert';
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SchoolData {
   String? schoolId;
   final String schoolName;
-  final Uint8List? schoolImage;
+  String? schoolImage;
 
   SchoolData({
     this.schoolId,
@@ -22,7 +20,7 @@ class SchoolData {
     return {
       'school_id': schoolId,
       'school_name': schoolName,
-      'school_image': schoolImage != null ? base64Encode(schoolImage!) : null,
+      'school_image': schoolImage,
     };
   }
 
@@ -31,7 +29,7 @@ class SchoolData {
     return {
       'school_id': schoolId,
       'school_name': schoolName,
-      'school_image': schoolImage != null ? base64Encode(schoolImage!) : null,
+      'school_image': schoolImage,
     };
   }
 
@@ -41,9 +39,7 @@ class SchoolData {
     return SchoolData(
       schoolId: data['school_id'] ?? 'Unkown',
       schoolName: data['school_name'] ?? 'Unknown',
-      schoolImage: data['school_image'] != null
-          ? base64Decode(data['school_image'])
-          : null,
+      schoolImage: data['school_image'],
     );
   }
 }

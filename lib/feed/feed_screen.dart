@@ -92,7 +92,7 @@ class _FeedScreenState extends State<FeedScreen> {
                       child: Center(
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage: AssetImage('assets/mju.jpg'),
+                          backgroundImage: NetworkImage(school.schoolImage!),
                         ),
                       ),
                     ),
