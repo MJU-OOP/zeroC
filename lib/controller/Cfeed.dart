@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:zero_c/data/post_data.dart';
+import 'package:zero_c/data/Mfeed.dart';
 
 class FeedController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

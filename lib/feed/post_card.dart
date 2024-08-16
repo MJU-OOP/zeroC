@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // 날짜 포맷을 위한 패키지
-import 'package:zero_c/data/post_data.dart';
+import 'package:zero_c/data/Mfeed.dart';
 
 class PostCard extends StatelessWidget {
   final PostData post;

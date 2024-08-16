@@ -51,9 +51,8 @@ class PostData {
       profileImage: data['profile_image'] != null
           ? base64Decode(data['profile_image'])
           : null,
-      feedImage: data['feed_image'] != null
-          ? base64Decode(data['feed_image'])
-          : null,
+      feedImage:
+          data['feed_image'] != null ? base64Decode(data['feed_image']) : null,
       createAt: (data['create_at'] as Timestamp).toDate(),
       schoolId: data['school_id'] ?? 'Unknown',
     );

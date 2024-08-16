@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:zero_c/controller/Cfeed.dart';
-import 'package:zero_c/data/post_data.dart';
+import 'package:zero_c/data/Mfeed.dart';
 import 'feed_screen.dart';
 
 class CertifyScreen extends StatefulWidget {

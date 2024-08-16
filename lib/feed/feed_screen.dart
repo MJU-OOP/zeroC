@@ -3,7 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:zero_c/controller/Cfeed.dart';
 import 'package:zero_c/controller/Cschool.dart';
 import 'package:zero_c/data/Mschool.dart';
-import 'package:zero_c/data/post_data.dart';
+import 'package:zero_c/data/Mfeed.dart';
 import 'package:zero_c/feed/post_card.dart';
 import 'package:zero_c/rank/home_screen.dart';
 
