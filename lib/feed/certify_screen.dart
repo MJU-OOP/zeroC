@@ -71,6 +71,7 @@ class _CertifyScreenState extends State<CertifyScreen> {
         feedImage: null,  // 이미지 URL은 나중에 추가됨
         createAt: DateTime.now(),
         schoolId: _schoolId!,
+        like: 0
       );
 
       await _feedController.addPost(newPost, _feedImage);

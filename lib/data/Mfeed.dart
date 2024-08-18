@@ -7,21 +7,22 @@ class PostData {
   final String username;
   final String content;
   final String? profileImage;
-  final String? feedImage; 
+  final String? feedImage;
   final DateTime createAt;
   final String schoolId;
+  final int like;
 
-  PostData({
-    this.feedId,
-    required this.userId,
-    required this.challengeId,
-    required this.username,
-    required this.content,
-    this.profileImage,
-    this.feedImage,
-    required this.createAt,
-    required this.schoolId,
-  });
+  PostData(
+      {this.feedId,
+      required this.userId,
+      required this.challengeId,
+      required this.username,
+      required this.content,
+      this.profileImage,
+      this.feedImage,
+      required this.createAt,
+      required this.schoolId,
+      required this.like});
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -33,6 +34,7 @@ class PostData {
       'feed_image': feedImage,
       'create_at': createAt,
       'school_id': schoolId,
+      'like': like
     };
   }
 
@@ -48,6 +50,7 @@ class PostData {
       feedImage: data['feed_image'],
       createAt: (data['create_at'] as Timestamp).toDate(),
       schoolId: data['school_id'] ?? 'Unknown',
+      like: data['like'] ?? 0
     );
   }
 
@@ -62,6 +65,7 @@ class PostData {
       feedImage: feedImage ?? this.feedImage,
       createAt: createAt,
       schoolId: schoolId,
+      like: like
     );
   }
 }
