@@ -10,9 +10,7 @@ import 'package:zero_c/rank/home_screen.dart';
 class FeedScreen extends StatefulWidget {
   final String schoolId;
 
-  FeedScreen({
-    required this.schoolId,
-  });
+  FeedScreen({required this.schoolId});
 
   @override
   _FeedScreenState createState() => _FeedScreenState();
@@ -28,6 +26,7 @@ class _FeedScreenState extends State<FeedScreen> {
     schoolImage: null,
   );
   bool isLoading = true;
+  String _sortOrder = 'latest'; // 기본 정렬 방식을 'latest'로 설정
 
   @override
   void initState() {
@@ -37,11 +36,16 @@ class _FeedScreenState extends State<FeedScreen> {
 
   Future<void> _loadPosts() async {
     try {
-      // schoolId에 해당하는 게시글들을 불러옴
-      final loadedPosts =
-          await _feedController.getPostsBySchool(widget.schoolId);
-      final loadedSchool =
-          await _schoolController.getSchoolById(widget.schoolId);
+      List<PostData> loadedPosts = [];
+
+      if (_sortOrder == 'latest') {
+        loadedPosts = await _feedController.getPostsBySchool(widget.schoolId);
+      } else if (_sortOrder == 'likes') {
+        loadedPosts = await _feedController.getPostsSortedByLikes(widget.schoolId);
+      }
+
+      final loadedSchool = await _schoolController.getSchoolById(widget.schoolId);
+
       setState(() {
         posts = loadedPosts;
         if (loadedSchool != null) {
@@ -62,6 +66,14 @@ class _FeedScreenState extends State<FeedScreen> {
         gravity: ToastGravity.BOTTOM,
       );
     }
+  }
+
+  void _changeSortOrder(String newSortOrder) {
+    setState(() {
+      _sortOrder = newSortOrder;
+      isLoading = true;
+    });
+    _loadPosts();
   }
 
   @override
@@ -97,6 +109,22 @@ class _FeedScreenState extends State<FeedScreen> {
                       ),
                     ),
                   ),
+                  actions: [
+                    PopupMenuButton<String>(
+                      onSelected: _changeSortOrder,
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'latest',
+                          child: Text('Latest'),
+                        ),
+                        PopupMenuItem(
+                          value: 'likes',
+                          child: Text('Most Liked'),
+                        ),
+                      ],
+                      icon: Icon(Icons.sort),
+                    ),
+                  ],
                 ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
