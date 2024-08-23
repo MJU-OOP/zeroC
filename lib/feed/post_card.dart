@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -20,10 +21,12 @@ class _PostCardState extends State<PostCard> {
   bool _isLiked = false;
   int _likeCount = 0;
   final FeedController _feedController = FeedController();
+  User? _currentUser;
   bool _isProcessing = false; // 서버 통신 중인지 여부를 나타내는 플래그
 
   @override
   void initState() {
+    _currentUser = FirebaseAuth.instance.currentUser;
     super.initState();
     _likeCount = widget.post.like;
     _checkIfLiked();
@@ -31,10 +34,12 @@ class _PostCardState extends State<PostCard> {
 
   Future<void> _checkIfLiked() async {
     bool liked =
-        await _feedController.checkIfLiked(widget.post, widget.post.userId);
-    setState(() {
-      _isLiked = liked;
-    });
+        await _feedController.checkIfLiked(widget.post, _currentUser!.uid);
+    if (mounted) {
+      setState(() {
+        _isLiked = liked;
+      });
+    }
   }
 
   Future<void> _toggleLike() async {
@@ -50,12 +55,14 @@ class _PostCardState extends State<PostCard> {
 
     while (!success && retryCount < maxRetries) {
       try {
-        await _feedController.updateLike(widget.post, widget.post.userId);
+        await _feedController.updateLike(widget.post, _currentUser!.uid);
         success = true;
-        setState(() {
-          _isLiked = !_isLiked;
-          _likeCount += _isLiked ? 1 : -1;
-        });
+        if (mounted) {
+          setState(() {
+            _isLiked = !_isLiked;
+            _likeCount += _isLiked ? 1 : -1;
+          });
+        }
       } catch (e) {
         retryCount++;
         if (retryCount >= maxRetries) {
@@ -69,9 +76,17 @@ class _PostCardState extends State<PostCard> {
       }
     }
 
-    setState(() {
-      _isProcessing = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isProcessing = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // 필요한 리소스 해제 작업을 여기에 추가할 수 있습니다.
+    super.dispose();
   }
 
   @override
@@ -95,23 +110,49 @@ class _PostCardState extends State<PostCard> {
             ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(widget.post.content),
-          ),
-          ButtonBar(
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.thumb_up,
-                  color: _isLiked ? Colors.greenAccent : Colors.grey,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: widget.post.username,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black, // 기본 색상 설정
+                          ),
+                        ),
+                        TextSpan(
+                          text: '  ', // 간격 추가
+                        ),
+                        TextSpan(
+                          text: widget.post.content,
+                          style: TextStyle(
+                            color: Colors.black, // 기본 색상 설정
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                onPressed: _toggleLike,
-              ),
-              Text('$_likeCount'), // 좋아요 수 표시
-              IconButton(
-                icon: const Icon(Icons.comment),
-                onPressed: () {},
-              ),
-            ],
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.eco,
+                        color: _isLiked ? Colors.greenAccent : Colors.grey,
+                        size: 25.0,
+                      ),
+                      onPressed: _toggleLike,
+                    ),
+                    Text('$_likeCount'),
+                    SizedBox(width: 4),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
