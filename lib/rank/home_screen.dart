@@ -179,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
         unselectedItemColor: Colors.grey, // 선택되지 않은 아이템 색상 설정
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.check_circle),
+            icon: Icon(Icons.edit_square),
             label: '인증',
           ),
           BottomNavigationBarItem(
