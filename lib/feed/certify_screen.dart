@@ -16,7 +16,7 @@ class CertifyScreen extends StatefulWidget {
 class _CertifyScreenState extends State<CertifyScreen> {
   final _textController = TextEditingController();
   final FeedController _feedController = FeedController();
-  Uint8List? _feedImage;  // 이미지 데이터를 Uint8List로 받음
+  Uint8List? _feedImage; // 이미지 데이터를 Uint8List로 받음
   User? _currentUser;
   String? _username;
   String? _schoolId;
@@ -61,18 +61,20 @@ class _CertifyScreenState extends State<CertifyScreen> {
   }
 
   void _submitPost() async {
-    if (_textController.text.isNotEmpty && _feedImage != null && _username != null && _schoolId != null) {
+    if (_textController.text.isNotEmpty &&
+        _feedImage != null &&
+        _username != null &&
+        _schoolId != null) {
       final newPost = PostData(
-        userId: _currentUser?.uid ?? "Unknown",
-        challengeId: "4",
-        username: _username!,
-        content: _textController.text,
-        profileImage: null,  // 프로필 이미지를 업로드하는 부분은 생략됨
-        feedImage: null,  // 이미지 URL은 나중에 추가됨
-        createAt: DateTime.now(),
-        schoolId: _schoolId!,
-        like: 0
-      );
+          userId: _currentUser?.uid ?? "Unknown",
+          challengeId: "4",
+          username: _username!,
+          content: _textController.text,
+          profileImage: null, // 프로필 이미지를 업로드하는 부분은 생략됨
+          feedImage: null, // 이미지 URL은 나중에 추가됨
+          createAt: DateTime.now(),
+          schoolId: _schoolId!,
+          like: 0);
 
       await _feedController.addPost(newPost, _feedImage);
 
@@ -86,7 +88,7 @@ class _CertifyScreenState extends State<CertifyScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => FeedScreen(
-            schoolId: _schoolId!, 
+            schoolId: _schoolId!,
           ),
         ),
       );
@@ -102,8 +104,17 @@ class _CertifyScreenState extends State<CertifyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('게시글 인증'),
+        backgroundColor: Color(0xFF4FC3B7), // 초록색 배경
+        title: Center(
+          child: Text(
+            '이번주 챌린지: 텀블러 사용',
+            style: TextStyle(
+              color: Colors.white, // 하얀색 글자
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -132,6 +143,10 @@ class _CertifyScreenState extends State<CertifyScreen> {
             ),
             ElevatedButton(
               onPressed: _submitPost,
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Color(0xFF4FC3B7), // 하얀색 글자
+              ),
               child: Text('제출'),
             ),
           ],
