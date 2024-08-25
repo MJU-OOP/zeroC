@@ -27,6 +27,7 @@ class _FeedScreenState extends State<FeedScreen> {
   );
   bool isLoading = true;
   String _sortOrder = 'latest'; // 기본 정렬 방식을 'latest'로 설정
+  bool _isScrolled = false;
 
   @override
   void initState() {
@@ -41,10 +42,12 @@ class _FeedScreenState extends State<FeedScreen> {
       if (_sortOrder == 'latest') {
         loadedPosts = await _feedController.getPostsBySchool(widget.schoolId);
       } else if (_sortOrder == 'likes') {
-        loadedPosts = await _feedController.getPostsSortedByLikes(widget.schoolId);
+        loadedPosts =
+            await _feedController.getPostsSortedByLikes(widget.schoolId);
       }
 
-      final loadedSchool = await _schoolController.getSchoolById(widget.schoolId);
+      final loadedSchool =
+          await _schoolController.getSchoolById(widget.schoolId);
 
       setState(() {
         posts = loadedPosts;
@@ -79,65 +82,90 @@ class _FeedScreenState extends State<FeedScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLoading
-          ? Center(child: CircularProgressIndicator()) // 로딩 중일 때 표시되는 인디케이터
-          : CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  leading: IconButton(
-                    icon: Icon(Icons.home),
-                    onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
-                        (Route<dynamic> route) => false,
-                      );
-                    },
-                  ),
-                  expandedHeight: 200.0,
-                  pinned: true,
-                  flexibleSpace: FlexibleSpaceBar(
-                    centerTitle: true,
-                    title: Text(school.schoolName),
-                    background: Container(
-                      color: Colors.white,
-                      child: Center(
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: NetworkImage(school.schoolImage!),
+      backgroundColor: Colors.white,
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          setState(() {
+            _isScrolled = scrollInfo.metrics.pixels > 20;
+          });
+          return true;
+        },
+        child: isLoading
+            ? Center(child: CircularProgressIndicator()) // 로딩 중일 때 표시되는 인디케이터
+            : CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    leading: IconButton(
+                      icon: Icon(Icons.home,
+                          color:
+                              _isScrolled ? Colors.white : Color(0xFF4FC3B7)),
+                      onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HomeScreen()),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                    ),
+                    expandedHeight: 200.0,
+                    pinned: true,
+                    backgroundColor: _isScrolled
+                        ? Color(0xFF4FC3B7) // 스크롤 후의 배경색 (초록색)
+                        : Colors.white, // 스크롤 전의 배경색 (하얀색)
+                    flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: true,
+                      title: Text(school.schoolName,
+                          style: TextStyle(
+                            color: _isScrolled
+                                ? Colors.white
+                                : Color(0xFF4FC3B7), // 스크롤 전후의 텍스트 색상
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          )),
+                      background: Container(
+                        color: Colors.white,
+                        child: Center(
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(school.schoolImage!),
+                          ),
                         ),
                       ),
                     ),
+                    actions: [
+                      PopupMenuButton<String>(
+                        onSelected: _changeSortOrder,
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'latest',
+                            child: Text('Latest'),
+                          ),
+                          PopupMenuItem(
+                            value: 'likes',
+                            child: Text('Most Liked'),
+                          ),
+                        ],
+                        icon: Icon(Icons.sort,
+                            color: _isScrolled
+                                ? Colors.white
+                                : Color(0xFF4FC3B7)), // 스크롤 전후의 아이콘 색상
+                      ),
+                    ],
                   ),
-                  actions: [
-                    PopupMenuButton<String>(
-                      onSelected: _changeSortOrder,
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 'latest',
-                          child: Text('Latest'),
-                        ),
-                        PopupMenuItem(
-                          value: 'likes',
-                          child: Text('Most Liked'),
-                        ),
-                      ],
-                      icon: Icon(Icons.sort),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return PostCard(
+                          post: posts[index],
+                        );
+                      },
+                      childCount: posts.length,
                     ),
-                  ],
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return PostCard(
-                        post: posts[index],
-                      );
-                    },
-                    childCount: posts.length,
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 }
